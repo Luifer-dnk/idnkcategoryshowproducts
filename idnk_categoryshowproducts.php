@@ -1,23 +1,5 @@
 <?php
 
-/**
- * NOTICE OF LICENSE
- *
- * This file is not open source! Each license that you purchased is only available for 1 website only.
- * If you want to use this file on more websites (or projects), you need to purchase additional licenses.
- * You are not allowed to redistribute, resell, lease, license, sub-license or offer our resources to any third party.
- *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- * versions in the future. If you wish to customize PrestaShop for your
- * needs please contact us for extra customization service at an affordable price
- *
- * @author IDNK Soft <i@dnk.software>
- * @copyright  2021-2022 IDNK Soft
- * @license    Valid for 1 website (or project) for each purchase of license
- */
-
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
@@ -45,15 +27,18 @@ class Idnk_Categoryshowproducts extends Module
          */
         $this->bootstrap = true;
         parent::__construct();
-        $this->displayName = $this->l('IDNK Category show products');
+        $this->displayName = $this->l('Responsive category blocks');
         $this->description = $this->l('Responsive category blocks are displayed anywhere in your homepage. Customize the blocks to your taste and increase your client user experience.');
-        $this->ps_versions_compliancy = ['min' => '1.6', 'max' => _PS_VERSION_];
+        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         if (!$this->isRegisteredInHook('displayHome')) {
             $this->registerHook('displayHome');
         }
 
     }
-
+    /**
+     * Don't forget to create update methods if needed:
+     * http://doc.prestashop.com/display/PS16/Enabling+the+Auto-Update
+     */
     public function install()
     {
         Configuration::updateValue('IDNK_CSP_LIVE_MODE', true);
@@ -76,17 +61,19 @@ class Idnk_Categoryshowproducts extends Module
     {
         $sql = 'SELECT value FROM '._DB_PREFIX_.'configuration WHERE name = "IDNK_CSP_SELECTED_CAT"';
         $value = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
-
         if (!empty($value[0])) {
             $selected = explode(',', $value['value']);
-            $first_cat_id = array_shift($selected);
-
-            $category = new Category($first_cat_id);
-            $category_name = $category->getName((int)Context::getContext()->language->id);
-
-            $this->context->smarty->assign([
-                'category' => $category_name,
-            ]);
+            $catnum = 0;
+            $category_array = array(array());
+            foreach ($selected as $cat) {
+                $category = new Category($cat);
+                $current_name = implode(',', $category->name);
+                $category_array[$catnum]['category_name'] = $current_name;
+                $catnum++;
+            }
+            $this->context->smarty->assign(array(
+                'category' => $category_array,
+            ));
         }
     }
 
@@ -98,14 +85,14 @@ class Idnk_Categoryshowproducts extends Module
         /**
          * If values have been submitted in the form, process.
          */
-        if (((bool)Tools::isSubmit('submitIdnk_categoryshowproductsModule'))) {
+        if (((bool)Tools::isSubmit('submitIdnk_categoryshowproductsModule')) == true) {
             $this->postProcess();
         }
         $this->processConfiguration();
         $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
         $message = "";
-        if ((bool)Tools::getValue('cb_edited')) {
-            $message = $this->displayConfirmation($this->trans('The settings have been updated.', [], 'Admin.Notifications.Success'));
+        if ((bool)Tools::getValue('cb_edited') == true) {
+            $message = $this->displayConfirmation($this->trans('The settings have been updated.', array(), 'Admin.Notifications.Success'));
         }
         if (!empty(Tools::getValue('cb_error'))) {
             $error = (int)Tools::getValue('cb_error');
@@ -144,12 +131,12 @@ class Idnk_Categoryshowproducts extends Module
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
             .'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->tpl_vars = [
+        $helper->tpl_vars = array(
             'fields_value' => $this->getConfigFormValues(), /* Add values for your inputs */
             'languages' => $this->context->controller->getLanguages(),
             'id_language' => $this->context->language->id
-        ];
-        $output .= $helper->generateForm([$this->getConfigForm()]);
+        );
+        $output .= $helper->generateForm(array($this->getConfigForm()));
         return $output;
     }
 
@@ -166,46 +153,46 @@ class Idnk_Categoryshowproducts extends Module
             $index++;
         }
         if ($results != null) {
-            $fields_list = [
-                'id_idnk_csp' => [
+            $fields_list = array(
+                'id_idnk_csp' => array(
                     'title' => 'ID',
                     'width' => '100',
                     'type' => 'text',
                     'visible' => 'false'
-                ],
-                'idnk_category_name' => [
+                ),
+                'idnk_category_name' => array(
                     'title' => 'Category name',
                     'width' => 'auto',
                     'type' => 'text'
-                ],
-                'idnk_category_id' => [
+                ),
+                'idnk_category_id' => array(
                     'title' => 'Category ID',
                     'width' => 'auto',
                     'type' => 'text'
-                ],
-                'idnk_category_img' => [
+                ),
+                'idnk_category_img' => array(
                     'title' => 'Image',
                     'width' => 'auto',
                     'type' => 'text',
                     'prefix' => '<img class="image-box" src="../modules/idnk_categoryshowproducts/views/img/',
                     'suffix' => '" alt="Category image" />',
-                ],
-                'idnk_category_color' => [
+                ),
+                'idnk_category_color' => array(
                     'title' => 'Color',
                     'width' => 'auto',
                     'type' => 'text',
                     'maxlength' => 7,
                     'prefix' => '<div class="color-box" style="background-color:',
                     'suffix' => '"></div>',
-                ],
-            ];
+                ),
+            );
             $helper_list = new HelperList();
             $helper_list->module = $this;
             $helper_list->shopLinkType = '';
             $helper_list->no_link = true;
             $helper_list->simple_header = true;
             $helper_list->identifier = 'id_idnk_csp';
-            $helper_list->actions = ['editCategory'];
+            $helper_list->actions = array('editCategory');
             $helper_list->search = true;
             $helper_list->show_toolbar = false;
             $helper_list->title = 'Active categories';
@@ -217,14 +204,14 @@ class Idnk_Categoryshowproducts extends Module
         return false;
     }
 
-    public function displayEditCategoryLink($name = null, $id, $token = null)
+    public function displayEditCategoryLink($id, $name = null, $token = null)
     {
-        $this->smarty->assign([
-            'href' => 'index.php?controller=AdminCblocks&id_category=' . (int) $id . '&updatecblocks&token=' . Tools::getAdminTokenLite('AdminCblocks'),
-            'action' => $this->trans('Configure',[], 'Admin.Actions'),
+        $this->smarty->assign(array(
+            'href' => 'index.php?controller=AdminCatblocks&id_category=' . (int) $id . '&updatecatblocks&token=' . Tools::getAdminTokenLite('AdminCatblocks'),
+            'action' => $this->trans('Configure', array(), 'Admin.Actions'),
             'disable' => !((int) $id > 0),
-        ]);
-        return $this->display(__FILE__, 'views/templates/admin/cblocks/editcategory.tpl');
+        ));
+        return $this->display(__FILE__, 'views/templates/admin/catblocks/editcategory.tpl');
     }
 
     /**
@@ -235,10 +222,11 @@ class Idnk_Categoryshowproducts extends Module
         $sql = 'SELECT * FROM '._DB_PREFIX_.'configuration WHERE name = "IDNK_CSP_SELECTED_CAT"';
         $value = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
 
+        // Verifica si se encontró la configuración
         if ($value && isset($value['value'])) {
             $selected = explode(',', $value['value']);
         } else {
-            $selected = [];
+            $selected = array(); // O cualquier otro valor predeterminado que desees asignar
         }
 
         $root = Category::getRootCategory();
@@ -251,45 +239,45 @@ class Idnk_Categoryshowproducts extends Module
             ->setInputName('IDNK_CSP_SELECTED_CAT');
         $categoryTreeCol1 = $tree->render();
 
-        return [
-            'form' => [
-                'legend' => [
+        return array(
+            'form' => array(
+                'legend' => array(
                     'title' => $this->l('Settings'),
                     'icon' => 'icon-cogs',
-                ],
-                'input' => [
-                    [
+                ),
+                'input' => array(
+                    array(
                         'type' => 'switch',
                         'label' => $this->l('Active'),
                         'name' => 'IDNK_CSP_LIVE_MODE',
                         'is_bool' => true,
                         'desc' => $this->l('Enable or disable this module'),
-                        'values' => [
-                            [
+                        'values' => array(
+                            array(
                                 'id' => 'active_on',
                                 'value' => true,
                                 'label' => $this->l('Enabled')
-                            ],
-                            [
+                            ),
+                            array(
                                 'id' => 'active_off',
                                 'value' => false,
                                 'label' => $this->l('Disabled')
-                            ]
-                        ],
-                    ],
-                    [
+                            )
+                        ),
+                    ),
+                    array(
                         'type' => 'categories_select',
                         'label' => $this->l('Categories'),
                         'desc' => $this->l('Select categories which will be displayed in home page. Save the selection for categories to appear in the list.'),
                         'name' => 'IDNK_CSP_SELECTED_CAT',
                         'category_tree' => $categoryTreeCol1
-                    ],
-                ],
-                'submit' => [
+                    ),
+                ),
+                'submit' => array(
                     'title' => $this->l('Save'),
-                ],
-            ],
-        ];
+                ),
+            ),
+        );
     }
 
     /**
@@ -298,10 +286,10 @@ class Idnk_Categoryshowproducts extends Module
     protected function getConfigFormValues()
     {
         $categories = explode(",", Configuration::get('IDNK_CSP_SELECTED_CAT'));
-        return [
+        return array(
             'IDNK_CSP_LIVE_MODE' => Configuration::get('IDNK_CSP_LIVE_MODE', true),
             'IDNK_CSP_SELECTED_CAT' => $categories,
-        ];
+        );
     }
 
     /**
@@ -336,7 +324,7 @@ class Idnk_Categoryshowproducts extends Module
                         $sql='DELETE FROM '. _DB_PREFIX_ . 'idnk_csp WHERE idnk_category_id IN ('.$q_delete_ids.')';
                         $db->Execute($sql);
                     }
-                    $_sql = [];
+                    $_sql = array();
                     foreach ($toCreate as $row) {
                         $_sql[] = '('.$db->escape($row).', "default.jpg", "#333333")';
                     }
@@ -394,10 +382,10 @@ class Idnk_Categoryshowproducts extends Module
             $id_lang = (int)$this->context->cookie->id_lang;
             $id_shop = (int)$this->context->shop->id;
             $catnum = 0;
-            $category_array = [[]];
+            $category_array = array(array());
             foreach ($results as $row) {
                 $category = new Category($row['idnk_category_id']);
-                $current_name = $category->getName((int)$id_lang);
+                $current_name = implode(',', $category->name);
                 $category_array[$catnum]['category_name'] = $current_name;
                 $category_array[$catnum]['category_color'] = $row['idnk_category_color'];
                 $category_array[$catnum]['category_image'] = Context::getContext()->shop->getBaseURL(true) . "modules/idnk_categoryshowproducts/views/img/" . $row['idnk_category_img'];
@@ -405,10 +393,20 @@ class Idnk_Categoryshowproducts extends Module
                 $category_array[$catnum]['category_product'] = $this->prepareBlocksProducts($category->getProducts((int)Context::getContext()->language->id, 1, 6, 'position'));
                 $catnum++;
             }
-            $this->context->smarty->assign([
+            $theme = $this->context->shop->theme->getName();
+            $this->context->smarty->assign('theme_name', $theme);
+            $this->context->smarty->assign(array(
                 'category' => $category_array,
-            ]);
-            return $this->display(__FILE__, 'cblocks.tpl');
+            ));
+
+            if ($theme === 'classic') {
+                return $this->display(__FILE__, 'catblocks_c.tpl');
+                } else if ($theme === 'hummingbird') {
+                    return $this->display(__FILE__, 'catblocks_h.tpl');
+                } else {
+                    return $this->display(__FILE__, 'catblocks_no.tpl');
+                }
+            
         }
         return false;
     }

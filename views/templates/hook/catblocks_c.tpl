@@ -1,0 +1,45 @@
+{**
+ * 2007-2020 PrestaShop and Contributors
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License 3.0 (AFL-3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/AFL-3.0
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to https://www.prestashop.com for more information.
+ *
+ * @author    Matas Skaržauskas <matasskarzauskas@gmail.com>
+ * @copyright 2007-2020 PrestaShop SA and Contributors
+ * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
+ * International Registered Trademark & Property of PrestaShop SA
+ *}
+{if isset($category) && $category}
+<div id="idnkcsp-block">
+{foreach from=$category item=c}
+    <div class="idnkcsp-container">
+        <div class="row aligned-row">
+
+            <div class="col-md-4 hidden-md-down col-lg-4 idnkcsp-product-list">
+                <img loading="lazy" class="idnkcsp-background" src="{$c.category_image}" />
+            </div>
+
+            <div class="col-sm-12 col-md-8 col-lg-8 idnkcsp-product-list idnkcsp-grid">
+                {foreach from=$c.category_product item="product"}
+                    {include file="modules/idnk_categoryshowproducts/views/templates/front/product_c.tpl" product=$product}
+                {/foreach}
+            </div>
+
+        </div>
+    </div>
+{/foreach}
+</div>
+{/if}
