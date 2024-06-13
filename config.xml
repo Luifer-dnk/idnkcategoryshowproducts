@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+    <name>idnk_categoryshowproducts</name>
+    <displayName><![CDATA[Responsive category blocks]]></displayName>
+    <version><![CDATA[1.0.0]]></version>
+    <description><![CDATA[Responsive category blocks are displayed anywhere in your homepage. Customize the blocks to your taste and increase your client user experience.]]></description>
+    <author><![CDATA[IDNK Soft]]></author>
+    <tab><![CDATA[front_office_features]]></tab>
+    <is_configurable>1</is_configurable>
+    <need_instance>1</need_instance>
+	<limited_countries></limited_countries>
+</module>

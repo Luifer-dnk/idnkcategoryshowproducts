@@ -1,0 +1,29 @@
+.color-box{
+    width:30px;
+    height:30px;
+    border:1px solid #e3e3e3;
+    border-radius:4px;
+    background-color:#333;
+}
+
+.image-box{
+    width:auto;
+    height:80px;
+    border:1px solid #e3e3e3;
+    border-radius:4px;
+}
+
+.icon-box{
+    width:auto;
+    height:40px;
+    border:1px solid #e3e3e3;
+    border-radius:4px;
+}
+
+#table-categories thead tr th:nth-child(1){
+    display:none !important;
+}
+
+#table-categories tbody tr td:nth-child(1){
+    display:none !important;
+}
