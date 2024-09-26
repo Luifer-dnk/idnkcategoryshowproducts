@@ -43,7 +43,7 @@ class AdminCblocksController extends ModuleAdminController
 
             if (isset($_FILES['category_img']) && !empty($_FILES['category_img']["name"])) {
                 //$target_dir = _PS_UPLOAD_DIR_;
-                $target_dir = "..".__PS_BASE_URI__."modules/idnk_categoryshowproducts/views/img/";
+                $target_dir = "..".__PS_BASE_URI__."modules/idnkcategoryshowproducts/views/img/";
                 $target_file = $target_dir . basename($_FILES['category_img']["name"]);
                 $imageFileType = pathinfo($target_file, PATHINFO_EXTENSION);
                 // Check if image file is a actual image or fake image
@@ -52,21 +52,21 @@ class AdminCblocksController extends ModuleAdminController
                     $uploadOk = 1;
                 } else {
                     $this->redirect_after = Context::getContext()->link->getAdminLink('AdminModules', false).
-                        '&configure=idnk_categoryshowproducts&cb_error=3&token=' . Tools::getAdminTokenLite('AdminModules');
+                        '&configure=idnkcategoryshowproducts&cb_error=3&token=' . Tools::getAdminTokenLite('AdminModules');
                     $uploadOk = 0;
                 }
                 // Allow certain file formats
                 if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
                     && $imageFileType != "gif") {
                     $this->redirect_after = Context::getContext()->link->getAdminLink('AdminModules', false).
-                        '&configure=idnk_categoryshowproducts&cb_error=1&token=' . Tools::getAdminTokenLite('AdminModules');
+                        '&configure=idnkcategoryshowproducts&cb_error=1&token=' . Tools::getAdminTokenLite('AdminModules');
                     $uploadOk = 0;
                 }
                 // Check if $uploadOk is set to 0 by an error
                 if ($uploadOk != 0) {
                     if (!move_uploaded_file($_FILES['category_img']["tmp_name"], $target_file)) {
                         $this->redirect_after = Context::getContext()->link->getAdminLink('AdminModules', false).
-                            '&configure=idnk_categoryshowproducts&cb_error=2&token=' . Tools::getAdminTokenLite('AdminModules');
+                            '&configure=idnkcategoryshowproducts&cb_error=2&token=' . Tools::getAdminTokenLite('AdminModules');
                     }
                 }
             }
@@ -76,8 +76,8 @@ class AdminCblocksController extends ModuleAdminController
                     Db::getInstance()->update(
                         'idnk_csp',
                         [
-                            'idnk_category_img' => pSQL($category_img),
-                            'idnk_category_color' => pSQL($color),
+                            'idnkcategory_img' => pSQL($category_img),
+                            'idnkcategory_color' => pSQL($color),
                         ],
                         'id_idnk_csp = '. Tools::getValue('category_id')
                     );
@@ -85,14 +85,14 @@ class AdminCblocksController extends ModuleAdminController
                     Db::getInstance()->update(
                         'idnk_csp',
                         [
-                            'idnk_category_color' => pSQL($color),
+                            'idnkcategory_color' => pSQL($color),
                         ],
                         'id_idnk_csp = '. Tools::getValue('category_id')
                     );
                 }
                 // all is ok, redirect to main
                 $this->redirect_after = Context::getContext()->link->getAdminLink('AdminModules', false).
-                    '&configure=idnk_categoryshowproducts&cb_edited=true&token=' . Tools::getAdminTokenLite('AdminModules');
+                    '&configure=idnkcategoryshowproducts&cb_edited=true&token=' . Tools::getAdminTokenLite('AdminModules');
             }
         }
     }
@@ -137,11 +137,14 @@ class AdminCblocksController extends ModuleAdminController
         if (!empty(Tools::getValue('id_category'))) {
             $get = Tools::getValue('id_category');
             $db = Db::getInstance();
-            $sql='SELECT * FROM ' . _DB_PREFIX_ . 'idnk_csp WHERE id_idnk_csp = ' . $get;
-            $results=$db->ExecuteS($sql);
-            return $results[0];
-        };
-        return 0;
+            $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'idnk_csp WHERE id_idnk_csp = ' . (int)$get;
+            $results = $db->ExecuteS($sql);
+            if (!empty($results)) {
+                return $results[0];
+            }
+        }
+        // Devuelve un array vacío si no se encuentra ningún registro
+        return [];
     }
 
     public function getCategoryName($id)
@@ -153,14 +156,31 @@ class AdminCblocksController extends ModuleAdminController
     public function initContent()
     {
         parent::initContent();
-        $this->context->smarty->assign([
-            'id'=> $this->getSelection()['id_idnk_csp'],
-            'name' => $this->getCategoryName((int)$this->getSelection()['idnk_category_id'])[1],
-            'image_url' => $this->getSelection()['idnk_category_img'],
-            'color' => $this->getSelection()['idnk_category_color'],
-            'base_url' => Context::getContext()->shop->getBaseURL(true),
-            'max_upload_size' => $this->fileUploadMaxSize(),
-            $this->setTemplate('category.tpl'),
-        ]);
+
+        $selection = $this->getSelection();
+
+        if (!empty($selection)) {
+            $this->context->smarty->assign([
+                'id'=> isset($selection['id_idnk_csp']) ? $selection['id_idnk_csp'] : null,
+                'name' => isset($selection['idnkcategory_id']) ? $this->getCategoryName((int)$selection['idnkcategory_id'])[1] : '',
+                'image_url' => isset($selection['idnkcategory_img']) ? $selection['idnkcategory_img'] : '',
+                'color' => isset($selection['idnkcategory_color']) ? $selection['idnkcategory_color'] : '',
+                'base_url' => Context::getContext()->shop->getBaseURL(true),
+                'max_upload_size' => $this->fileUploadMaxSize(),
+            ]);
+        } else {
+            // Maneja el caso cuando no hay selección
+            $this->context->smarty->assign([
+                'id' => null,
+                'name' => '',
+                'image_url' => '',
+                'color' => '',
+                'base_url' => Context::getContext()->shop->getBaseURL(true),
+                'max_upload_size' => $this->fileUploadMaxSize(),
+            ]);
+        }
+
+        $this->setTemplate('category.tpl');
     }
+
 }

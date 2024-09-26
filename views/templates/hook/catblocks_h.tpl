@@ -34,7 +34,7 @@
 
             <div class="col-sm-12 col-md-8 col-lg-8 idnkcsp-product-list idnkcsp-grid">
                 {foreach from=$c.category_product item="product"}
-                    {include file="modules/idnk_categoryshowproducts/views/templates/front/product_h.tpl" product=$product}
+                    {include file="modules/idnkcategoryshowproducts/views/templates/front/product_h.tpl" product=$product}
                 {/foreach}
             </div>
 

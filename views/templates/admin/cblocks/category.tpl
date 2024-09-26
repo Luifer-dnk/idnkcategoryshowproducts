@@ -15,8 +15,8 @@
  * @copyright  2021-2022 IDNK Soft
  * @license    Valid for 1 website (or project) for each purchase of license
 *}
-<link rel="stylesheet" type="text/css" href="../modules/idnk_categoryshowproducts/views/css/spectrum.min.css" />
-<script type="text/javascript" src="../modules/idnk_categoryshowproducts/views/js/spectrum.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../modules/idnkcategoryshowproducts/views/css/spectrum.min.css" />
+<script type="text/javascript" src="../modules/idnkcategoryshowproducts/views/js/spectrum.min.js"></script>
 <style>
     .preview-side{
         height:300px;
@@ -66,9 +66,9 @@
     <div class="form-wrapper idnkcsp-preview">
         <div class="preview-side"></div>
         <span class="preview-text">Category</span>
-        <img id="category-preview" src="{$base_url}modules/idnk_categoryshowproducts/views/img/preview.jpg" alt="Preview" />
+        <img id="category-preview" src="{$base_url}modules/idnkcategoryshowproducts/views/img/preview.jpg" alt="Preview" />
         <img id="category-img-preview" src="
-        {$base_url}modules/idnk_categoryshowproducts/views/img/{$image_url}
+        {$base_url}modules/idnkcategoryshowproducts/views/img/{$image_url}
         " alt="Preview" />
         <img id="category-img" src="#" alt="Select category block image" />
     </div>
@@ -88,7 +88,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="control-label col-lg-3">{l s="Select category block image" mod="idnk_categoryshowproducts"}</label>
+                <label class="control-label col-lg-3">{l s="Select category block image" mod="idnkcategoryshowproducts"}</label>
                 <div class="col-lg-6">
                     <input type="hidden" name="MAX_FILE_SIZE" value="{$max_upload_size}" />
                     <input type="file" accept="image/x-png,image/gif,image/jpeg" class="required form-control" id="category_img" name="category_img" onchange="readURL(this);"/>
@@ -109,11 +109,11 @@
         </div>
     </div>
     <div class="panel-footer">
-        <a href="{$link->getAdminLink('AdminModules', false)}&configure=idnk_categoryshowproducts&token={Tools::getAdminTokenLite('AdminModules')}" class="btn btn-default">
-            <i class="process-icon-back"></i> {l s="Back" mod="idnk_categoryshowproducts"}
+        <a href="{$link->getAdminLink('AdminModules', false)}&configure=idnkcategoryshowproducts&token={Tools::getAdminTokenLite('AdminModules')}" class="btn btn-default">
+            <i class="process-icon-back"></i> {l s="Back" mod="idnkcategoryshowproducts"}
         </a>
         <button type="submit" value="1" id="cms_form_submit_btn" name="saveCategoryData" class="btn btn-default pull-right">
-            <i class="process-icon-save"></i> {l s="Save" mod="idnk_categoryshowproducts"}
+            <i class="process-icon-save"></i> {l s="Save" mod="idnkcategoryshowproducts"}
         </button>
     </div>
 

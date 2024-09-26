@@ -22,9 +22,9 @@ $sql = [];
 $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'idnk_csp` (
     `id_idnk_csp` int(11) NOT NULL AUTO_INCREMENT,
     PRIMARY KEY  (`id_idnk_csp`),
-    `idnk_category_id` int(11) NOT NULL,
-    `idnk_category_img` varchar(255) NOT NULL,
-    `idnk_category_color` varchar(255) NOT NULL
+    `idnkcategory_id` int(11) NOT NULL,
+    `idnkcategory_img` varchar(255) NOT NULL,
+    `idnkcategory_color` varchar(255) NOT NULL
 ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
 foreach ($sql as $query) {

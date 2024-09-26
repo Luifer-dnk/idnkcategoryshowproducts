@@ -1,10 +1,10 @@
 function activateButton(object){
     object.querySelector('.idnkcsp-cart').style.display = "block";
-};
+}
 
 function disableButton(object){
     object.querySelector('.idnkcsp-cart').style.display = "none";
-};
+}
 
 $(window).scroll(function() {
     var top_of_element = $("#idnkcsp-block").offset().top;
