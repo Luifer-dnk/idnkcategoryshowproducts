@@ -38,75 +38,39 @@ class AdminCblocksController extends ModuleAdminController
             $category_img = basename($_FILES['category_img']["name"]);
             $color = Tools::getValue('category_color');
             $uploadOk = 1;
+            /*===================== Handling Image for Prestashop Upload: Start ===================== */
+            //file upload code
 
             if (isset($_FILES['category_img']) && !empty($_FILES['category_img']["name"])) {
-                $target_dir = ".." . __PS_BASE_URI__ . "modules/idnkcategoryshowproducts/views/img/";
+                //$target_dir = _PS_UPLOAD_DIR_;
+                $target_dir = "..".__PS_BASE_URI__."modules/idnkcategoryshowproducts/views/img/";
                 $target_file = $target_dir . basename($_FILES['category_img']["name"]);
                 $imageFileType = pathinfo($target_file, PATHINFO_EXTENSION);
-
+                // Check if image file is a actual image or fake image
                 $check = getimagesize($_FILES['category_img']["tmp_name"]);
                 if ($check !== false) {
                     $uploadOk = 1;
                 } else {
-                    $this->redirect_after = Context::getContext()->link->getAdminLink('AdminModules', false) .
+                    $this->redirect_after = Context::getContext()->link->getAdminLink('AdminModules', false).
                         '&configure=idnkcategoryshowproducts&cb_error=3&token=' . Tools::getAdminTokenLite('AdminModules');
                     $uploadOk = 0;
                 }
-
-                if (!in_array($imageFileType, ['jpg', 'png', 'jpeg', 'gif'])) {
-                    $this->redirect_after = Context::getContext()->link->getAdminLink('AdminModules', false) .
+                // Allow certain file formats
+                if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+                    && $imageFileType != "gif") {
+                    $this->redirect_after = Context::getContext()->link->getAdminLink('AdminModules', false).
                         '&configure=idnkcategoryshowproducts&cb_error=1&token=' . Tools::getAdminTokenLite('AdminModules');
                     $uploadOk = 0;
                 }
-
+                // Check if $uploadOk is set to 0 by an error
                 if ($uploadOk != 0) {
-                    if (move_uploaded_file($_FILES['category_img']["tmp_name"], $target_file)) {
-                        $resized_image_path = $target_dir . 'resized_' . basename($_FILES['category_img']["name"]);
-
-                        list($original_width, $original_height) = getimagesize($target_file);
-                        $target_height = 765;
-                        $target_width = 380;
-
-                        $ratio = $original_width / $original_height;
-                        $new_width = $target_height * $ratio;
-                        $new_height = $target_height;
-
-                        if (ImageManager::resize($target_file, $resized_image_path, $new_width, $new_height, $imageFileType)) {
-                            $image_resource = imagecreatefromstring(file_get_contents($resized_image_path));
-
-                            if ($image_resource) {
-                                $image_width = imagesx($image_resource);
-                                $image_height = imagesy($image_resource);
-
-                                if ($image_width > $target_width) {
-                                    $crop_x = max(0, ($image_width - $target_width) / 2);
-
-                                    $cropped_image = imagecrop($image_resource, [
-                                        'x' => $crop_x,
-                                        'y' => 0,
-                                        'width' => $target_width,
-                                        'height' => $target_height
-                                    ]);
-
-                                    if ($cropped_image !== false) {
-                                        // Guardar la imagen recortada
-                                        imagejpeg($cropped_image, $resized_image_path, 100);
-                                        imagedestroy($cropped_image);
-                                    }
-                                }
-
-                                imagedestroy($image_resource);
-                            }
-
-                            rename($resized_image_path, $target_file);
-                        }
-                    } else {
-                        $this->redirect_after = Context::getContext()->link->getAdminLink('AdminModules', false) .
+                    if (!move_uploaded_file($_FILES['category_img']["tmp_name"], $target_file)) {
+                        $this->redirect_after = Context::getContext()->link->getAdminLink('AdminModules', false).
                             '&configure=idnkcategoryshowproducts&cb_error=2&token=' . Tools::getAdminTokenLite('AdminModules');
                     }
                 }
             }
-
+            /*===================== Handling Image for Prestashop Upload: End ===================== */
             if ($uploadOk == 1) {
                 if (!empty($_FILES['category_img']["name"])) {
                     Db::getInstance()->update(
@@ -115,7 +79,7 @@ class AdminCblocksController extends ModuleAdminController
                             'idnkcategory_img' => pSQL($category_img),
                             'idnkcategory_color' => pSQL($color),
                         ],
-                        'id_idnk_csp = ' . Tools::getValue('category_id')
+                        'id_idnk_csp = '. Tools::getValue('category_id')
                     );
                 } else {
                     Db::getInstance()->update(
@@ -123,11 +87,11 @@ class AdminCblocksController extends ModuleAdminController
                         [
                             'idnkcategory_color' => pSQL($color),
                         ],
-                        'id_idnk_csp = ' . Tools::getValue('category_id')
+                        'id_idnk_csp = '. Tools::getValue('category_id')
                     );
                 }
-
-                $this->redirect_after = Context::getContext()->link->getAdminLink('AdminModules', false) .
+                // all is ok, redirect to main
+                $this->redirect_after = Context::getContext()->link->getAdminLink('AdminModules', false).
                     '&configure=idnkcategoryshowproducts&cb_edited=true&token=' . Tools::getAdminTokenLite('AdminModules');
             }
         }
