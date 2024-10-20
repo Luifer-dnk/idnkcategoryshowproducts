@@ -37,6 +37,8 @@ class AdminCblocksController extends ModuleAdminController
         if (Tools::isSubmit('saveCategoryData') && isset($_FILES['category_img'])) {
             $category_img = basename($_FILES['category_img']["name"]);
             $color = Tools::getValue('category_color');
+            $shadow = Tools::getValue('category_shadow');
+            $txtsize = Tools::getValue('category_txtsize');
             $uploadOk = 1;
 
             if (isset($_FILES['category_img']) && !empty($_FILES['category_img']["name"])) {
@@ -62,7 +64,7 @@ class AdminCblocksController extends ModuleAdminController
                 if ($uploadOk != 0) {
                     if (move_uploaded_file($_FILES['category_img']["tmp_name"], $target_file)) {
                         $resized_image_path = $target_dir . 'resized_' . basename($_FILES['category_img']["name"]);
-
+                        
                         list($original_width, $original_height) = getimagesize($target_file);
                         $target_height = 765;
                         $target_width = 380;
@@ -114,6 +116,8 @@ class AdminCblocksController extends ModuleAdminController
                         [
                             'idnkcategory_img' => pSQL($category_img),
                             'idnkcategory_color' => pSQL($color),
+                            'idnkcategory_shadow' => pSQL($shadow),
+                            'idnkcategory_txtsize' => pSQL($txtsize),
                         ],
                         'id_idnk_csp = ' . Tools::getValue('category_id')
                     );
@@ -122,6 +126,8 @@ class AdminCblocksController extends ModuleAdminController
                         'idnk_csp',
                         [
                             'idnkcategory_color' => pSQL($color),
+                            'idnkcategory_shadow' => pSQL($shadow),
+                            'idnkcategory_txtsize' => pSQL($txtsize),
                         ],
                         'id_idnk_csp = ' . Tools::getValue('category_id')
                     );
@@ -201,6 +207,8 @@ class AdminCblocksController extends ModuleAdminController
                 'name' => isset($selection['idnkcategory_id']) ? $this->getCategoryName((int)$selection['idnkcategory_id'])[1] : '',
                 'image_url' => isset($selection['idnkcategory_img']) ? $selection['idnkcategory_img'] : '',
                 'color' => isset($selection['idnkcategory_color']) ? $selection['idnkcategory_color'] : '',
+                'shadow' => isset($selection['idnkcategory_shadow']) ? $selection['idnkcategory_shadow'] : '',
+                'txtsize' => isset($selection['idnkcategory_txtsize']) ? $selection['idnkcategory_txtsize'] : '',
                 'base_url' => Context::getContext()->shop->getBaseURL(true),
                 'max_upload_size' => $this->fileUploadMaxSize(),
             ]);

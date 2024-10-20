@@ -23,23 +23,25 @@
  * International Registered Trademark & Property of PrestaShop SA
  *}
 {if isset($category) && $category}
-<div id="idnkcsp-block">
-{foreach from=$category item=c}
-    <div class="idnkcsp-container">
-        <div class="row aligned-row">
-
-            <div class="col-md-4 hidden-md-down col-lg-4 idnkcsp-product-list">
-                <img loading="lazy" class="idnkcsp-background" src="{$c.category_image}" />
+    <div id="idnkcsp-block">
+        {foreach from=$category item=c}
+            <div class="idnkcsp-container">
+                <div class="row aligned-row">
+                    <div class="col-md-4 hidden-md-down col-lg-4 idnkcsp-product-list">
+                        <div class="category-img-name">
+                        <h1 style="color:{$c.category_color}; text-shadow: 2px 2px {$c.category_shadow}; font-size: {$c.category_txtsize};" class="idnkcsp-category-name">{$c.category_name}</h1>
+                        </div>
+                        <img loading="lazy" class="idnkcsp-background" src="{$c.category_image}" />
+                    </div>
+                    <div class="col-sm-12 col-md-8 col-lg-8 idnkcsp-grid">
+                        {foreach from=$c.category_product item="product"}
+                            <div class="product-grid-c" style="padding: 10px 5px 10px 5px;">
+                            {include file=$product_template product=$product}
+                            </div> 
+                        {/foreach}
+                    </div>
+                </div>
             </div>
-
-            <div class="col-sm-12 col-md-8 col-lg-8 idnkcsp-product-list idnkcsp-grid">
-                {foreach from=$c.category_product item="product"}
-                    {include file="modules/idnkcategoryshowproducts/views/templates/front/product_c.tpl" product=$product}
-                {/foreach}
-            </div>
-
-        </div>
+        {/foreach}
     </div>
-{/foreach}
-</div>
 {/if}

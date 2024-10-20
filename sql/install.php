@@ -24,7 +24,9 @@ $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'idnk_csp` (
     PRIMARY KEY  (`id_idnk_csp`),
     `idnkcategory_id` int(11) NOT NULL,
     `idnkcategory_img` varchar(255) NOT NULL,
-    `idnkcategory_color` varchar(255) NOT NULL
+    `idnkcategory_color` varchar(255) NOT NULL,
+    `idnkcategory_shadow` varchar(255) NOT NULL,
+    `idnkcategory_txtsize` varchar(255) NOT NULL
 ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
 foreach ($sql as $query) {

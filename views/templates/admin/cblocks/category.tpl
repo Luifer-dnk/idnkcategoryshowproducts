@@ -51,11 +51,11 @@
     }
 
     .preview-text{
-        position:absolute;
-        top:10px;
-        left:20px;
-        font-weight:700;
-        font-size:11pt;
+        position: absolute;
+        top: 40%;
+        left: 2%;
+        font-weight: 700;
+        font-size: 16pt;
     }
 </style>
 
@@ -64,12 +64,11 @@
         <i class="icon-eye"></i> Block preview
     </div>
     <div class="form-wrapper idnkcsp-preview">
-        <div class="preview-side"></div>
         <span class="preview-text">Category</span>
-        <img id="category-preview" src="{$base_url}modules/idnkcategoryshowproducts/views/img/preview.jpg" alt="Preview" />
         <img id="category-img-preview" src="
         {$base_url}modules/idnkcategoryshowproducts/views/img/{$image_url}
         " alt="Preview" />
+        <img id="category-preview" src="{$base_url}modules/idnkcategoryshowproducts/views/img/preview.jpg" alt="Preview" />
         <img id="category-img" src="#" alt="Select category block image" />
     </div>
 </div>
@@ -98,12 +97,26 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="control-label col-lg-3">Category color<sup style="color:red">*</sup></label>
+                <label class="control-label col-lg-3">Category text color<sup style="color:red">*</sup></label>
                 <div class="col-lg-3">
                     <input type="text" id="color-picker" name="category_color" maxlength="7" value="{$color}" />
-                    <p class="help-block">
-                        Click in the textfield to choose color
-                    </p>
+                    <p class="help-block">Click in the textfield to choose color</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-lg-3">Shadow Category text color<sup style="color:red">*</sup></label>
+                <div class="col-lg-3">
+                    <input type="text" id="shadow-color-picker" name="category_shadow" maxlength="7" value="{$shadow}" />
+                    <p class="help-block">Click in the textfield to choose shadow color</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-lg-3">Size for text<sup style="color:red">*</sup></label>
+                <div class="col-lg-3">
+                    <input type="text" id="txtsize" name="category_txtsize" maxlength="7" value="{$txtsize}" />
+                    <p class="help-block">Text Size (e.g., 26px)</p>
                 </div>
             </div>
         </div>
@@ -119,34 +132,68 @@
 
     </div>
 
-    <script>
-        var initialColor = "{$color}";
-        $(".preview-side").css("background-color", initialColor);
-        $(".preview-text").css("color", initialColor);
+<script>
+    var initialColor = "{$color}";
+    var initialShadowColor = "{$shadow}";
 
-        function updateColor(element, color) {
-            $(element).css("background-color",(color ? color.toHexString() : ""));
+    // Aplicar el color inicial
+    $(".preview-side").css("background-color", initialColor);
+    $(".preview-text").css("color", initialColor);
+    $(".preview-text").css("text-shadow", "2px 2px " + initialShadowColor);
+
+    // Funciones para actualizar colores
+    function updateColor(element, color) {
+        $(element).css("background-color", (color ? color.toHexString() : ""));
+    }
+
+    function updateTextColor(element, color) {
+        $(element).css("color", (color ? color.toHexString() : ""));
+    }
+
+    function updateShadowColor(element, color) {
+        $(element).css("text-shadow", "2px 2px " + (color ? color.toHexString() : ""));
+    }
+
+    // Color picker para el texto
+    $('#color-picker').spectrum({
+        type: "component",
+        showAlpha: false,
+        clickoutFiresChange: true,
+        preferredFormat: 'hex',
+        showSelectionPalette: true,
+        showInput: false,
+        move: function (color) {
+            updateColor(".preview-side", color);
+            updateTextColor(".preview-text", color);
+        },
+        hide: function (color) {
+            updateColor(".preview-side", color);
+            updateTextColor(".preview-text", color);
         }
+    });
 
-        function updateTextColor(element, color) {
-            $(element).css("color",(color ? color.toHexString() : ""));
+    // Color picker para la sombra
+    $('#shadow-color-picker').spectrum({
+        type: "component",
+        showAlpha: false,
+        clickoutFiresChange: true,
+        preferredFormat: 'hex',
+        showSelectionPalette: true,
+        showInput: false,
+        move: function (color) {
+            updateShadowColor(".preview-text", color);
+        },
+        hide: function (color) {
+            updateShadowColor(".preview-text", color);
         }
+    });
 
-        $('#color-picker').spectrum({
-            type: "component",
-            showAlpha: false,
-            clickoutFiresChange: true,
-            preferredFormat: 'hex',
-            showSelectionPalette: true,
-            showInput: false,
-            move: function (color) { updateColor(".preview-side", color); updateTextColor(".preview-text", color);},
-            hide: function (color) { updateColor(".preview-side", color); updateTextColor(".preview-text", color);}
+    // Ajustes de estilo
+    $('.sp-colorize').css('height', '30px');
+    $('.sp-colorize').css('width', '30px');
+    $('input.spectrum.with-add-on').css('padding-left','10px');
+</script>
 
-        });
-        $('.sp-colorize').css('height', '30px');
-        $('.sp-colorize').css('width', '30px');
-        $('input.spectrum.with-add-on').css('padding-left','10px');
-    </script>
     <script>
         function readURL(input) {
             if (input.files && input.files[0]) {

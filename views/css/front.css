@@ -18,14 +18,12 @@ article.product-miniature.js-product-miniature.col-6.col-sm-4.col-md-11:hover {
     box-shadow: 0 2px 15px rgba(0,0,0,.5);
 }
 
-.aligned-row{
-    justify-content: center;
-    align-items: center;
-}
-
 .aligned-row {
     display: flex;
+    justify-content: center;
+    align-items: stretch;
     flex-flow: row wrap;
+    padding-bottom: 50px;
 }
 
 .aligned-row::before {
@@ -44,6 +42,16 @@ article.product-miniature.js-product-miniature.col-6.col-sm-4.col-md-11:hover {
     width: 100%;
     margin: 0 auto 20px !important;
     height:100%;
+    padding-bottom: 15px;
+}
+
+.category-img-name {
+    display: flex;
+    position: absolute;
+    width: 92%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
 }
 
 .idnkcsp-category-link-end{
@@ -57,8 +65,16 @@ article.product-miniature.js-product-miniature.col-6.col-sm-4.col-md-11:hover {
 }
 
 .idnkcsp-grid{
+    width: 65%;
     display: grid;
     grid-template-columns: repeat( 3, minmax(100px, 1fr) );
+    align-items: center;
+}
+
+.idnkcsp-product-list{
+    margin-right:0px !important;
+    width: 35%;
+    height:100%;
 }
 
 .idnkcsp-miniature {
@@ -73,11 +89,6 @@ article.product-miniature.js-product-miniature.col-6.col-sm-4.col-md-11:hover {
     width:100%;
     display:table-cell;
     text-align: center;
-}
-
-.idnkcsp-product-list{
-    margin-right:0px !important;
-    height:100%;
 }
 
 .idnkcsp-thumbnail img{
@@ -379,15 +390,7 @@ article.product-miniature.js-product-miniature.col-6.col-sm-4.col-md-11:hover {
         font-size:8pt;
     }
 
-    .idnkcsp-container {
-        max-height:none;
-    }
-
     .idnkcsp-product-list{
-        max-height:none !important;
-    }
-
-    .idnkcsp-grid{
         max-height:none !important;
     }
 
@@ -411,12 +414,28 @@ article.product-miniature.js-product-miniature.col-6.col-sm-4.col-md-11:hover {
     .idnkcsp-container {
         border-left: 0px solid;
         border-top: 5px solid;
+        max-height:none;
+        padding-bottom: 10px!important;
     }
 
     .idnkcsp-grid{
+        width: 100%;
+        max-height:none !important;
         display: grid;
         grid-template-columns: repeat( 2, minmax(100px, 1fr) );
         justify-items: center;
+    }
+
+    article.product-miniature.js-product-miniature.reviews-loaded{
+        height: 260px!important;
+    }
+
+    .product-miniature .thumbnail-container:hover{
+        height: 320px!important;
+    }
+
+    .product-miniature .product-description{
+        bottom: -20px !important;
     }
 
     article.product-miniature.js-product-miniature.col-11.col-sm-4.col-md-11 {

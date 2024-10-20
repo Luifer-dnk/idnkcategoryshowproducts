@@ -34,9 +34,9 @@
                     <div class="col-md-4 hidden-md-down col-lg-4 idnkcsp-product-list">
                         <img loading="lazy" class="idnkcsp-background" src="{$c.category_image}" />
                     </div>
-                    <div class="col-sm-12 col-md-8 col-lg-8 idnkcsp-product-list idnkcsp-grid">
+                    <div class="col-sm-12 col-md-8 col-lg-8 idnkcsp-grid">
                         {foreach from=$c.category_product item="product"}
-                            {include file="modules/idnkcategoryshowproducts/views/templates/front/product.tpl" product=$product}
+                            {include file=$product_template product=$product}
                         {/foreach}
                     </div>
                 </div>

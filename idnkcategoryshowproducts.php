@@ -197,6 +197,20 @@ class IdnkCategoryshowproducts extends Module
                     'prefix' => '<div class="color-box" style="background-color:',
                     'suffix' => '"></div>',
                 ],
+                'idnkcategory_shadow' => [
+                    'title' => 'Shadow',
+                    'width' => 'auto',
+                    'type' => 'text',
+                    'maxlength' => 7,
+                    'prefix' => '<div class="color-box" style="text-shadow:',
+                    'suffix' => '"></div>',
+                ],
+                'idnkcategory_txtsize' => [
+                    'title' => 'Text Size',
+                    'width' => 'auto',
+                    'type' => 'text',
+                    'maxlength' => 7,
+                ],
             ];
             $helper_list = new HelperList();
             $helper_list->module = $this;
@@ -306,56 +320,96 @@ class IdnkCategoryshowproducts extends Module
     /**
      * Save form data.
      */
-    protected function postProcess()
-    {
-        $form_values = $this->getConfigFormValues();
-        foreach (array_keys($form_values) as $key) {
-            Configuration::updateValue($key, Tools::getValue($key));
-            if ($key == 'IDNK_CSP_SELECTED_CAT') {
-                if (!empty(Tools::getValue($key))) {
-                    if (count(Tools::getValue($key))>1) {
-                        $categories = implode(",", Tools::getValue($key));
-                    } else {
-                        $categories = Tools::getValue($key)[0].",";
-                    }
-                    Configuration::updateValue('IDNK_CSP_SELECTED_CAT', $categories);
-                    $db = Db::getInstance();
-                    $sql='SELECT idnkcategory_id FROM ' . _DB_PREFIX_ . 'idnk_csp';
-                    $results=$db->ExecuteS($sql);
-                    $db_categories = [];
-                    foreach ($results as $res) {
-                        foreach ($res as $sel) {
-                            array_push($db_categories, $sel);
-                        }
-                    }
-                    $toDelete = array_diff($db_categories, Tools::getValue($key));
-                    $toCreate = array_diff(Tools::getValue($key), $db_categories);
-                    if (count($toDelete)>0) {
-                        $q_delete_ids = implode(', ', array_map('intval', $toDelete));
-                        $sql='DELETE FROM '. _DB_PREFIX_ . 'idnk_csp WHERE idnkcategory_id IN ('.$q_delete_ids.')';
-                        $db->Execute($sql);
-                    }
-                    $_sql = [];
-                    foreach ($toCreate as $row) {
-                        $_sql[] = '('.$db->escape($row).', "default.jpg", "#333333")';
-                    }
-                    if (count($toCreate)>0) {
-                        $sql='INSERT INTO '. _DB_PREFIX_ . 'idnk_csp 
-                        (idnkcategory_id, idnkcategory_img, idnkcategory_color)
-                        VALUES
-                        ' .implode(',', $_sql);
-                        $db->Execute($sql);
-                    }
+protected function postProcess()
+{
+    $form_values = $this->getConfigFormValues();
+    foreach (array_keys($form_values) as $key) {
+        Configuration::updateValue($key, Tools::getValue($key));
+
+        if ($key == 'IDNK_CSP_SELECTED_CAT') {
+            if (!empty(Tools::getValue($key))) {
+                if (count(Tools::getValue($key)) > 1) {
+                    $categories = implode(",", Tools::getValue($key));
                 } else {
-                    Configuration::updateValue('IDNK_CSP_SELECTED_CAT', '');
-                    $db = Db::getInstance();
-                    $sql='DELETE FROM '. _DB_PREFIX_ . 'idnk_csp';
+                    $categories = Tools::getValue($key)[0] . ",";
+                }
+
+                Configuration::updateValue('IDNK_CSP_SELECTED_CAT', $categories);
+                $db = Db::getInstance();
+
+                // Obtener los IDs de las categorías existentes
+                $sql = 'SELECT idnkcategory_id FROM ' . _DB_PREFIX_ . 'idnk_csp';
+                $results = $db->ExecuteS($sql);
+                $db_categories = [];
+                foreach ($results as $res) {
+                    foreach ($res as $sel) {
+                        array_push($db_categories, $sel);
+                    }
+                }
+
+                // Calcular categorías a eliminar y a crear
+                $toDelete = array_diff($db_categories, Tools::getValue($key));
+                $toCreate = array_diff(Tools::getValue($key), $db_categories);
+
+                // Eliminar categorías que ya no están seleccionadas
+                if (count($toDelete) > 0) {
+                    $q_delete_ids = implode(', ', array_map('intval', $toDelete));
+                    $sql = 'DELETE FROM ' . _DB_PREFIX_ . 'idnk_csp WHERE idnkcategory_id IN (' . $q_delete_ids . ')';
                     $db->Execute($sql);
                 }
+
+                // Preparar nuevas categorías para insertar
+                $_sql = [];
+                foreach ($toCreate as $row) {
+                    $defaultImage = "default.jpg"; 
+                    $defaultColor = "#333333"; 
+                    $defaultShadow = "#000000";
+                    $defaultTxtSize = "16px";
+
+                    $_sql[] = '(' . $db->escape($row) . ', "' . $defaultImage . '", "' . $defaultColor . '", "' . $defaultShadow . '", "' . $defaultTxtSize . '")';
+                }
+
+                if (count($toCreate) > 0) {
+                    $sql = 'INSERT INTO ' . _DB_PREFIX_ . 'idnk_csp 
+                            (idnkcategory_id, idnkcategory_img, idnkcategory_color, idnkcategory_shadow, idnkcategory_txtsize)
+                            VALUES ' . implode(',', $_sql);
+                    $db->Execute($sql);
+                }
+
+                // Actualizar los campos shadow y txtsize si es necesario
+                foreach (Tools::getValue($key) as $categoryId) {
+                    $shadowColor = Tools::getValue('shadow_color_' . $categoryId);
+                    $txtSize = Tools::getValue('txt_size_' . $categoryId); // Asumiendo que tienes un campo para el tamaño de texto por categoría
+                    
+                    // Actualizar sombra si es necesario
+                    if ($shadowColor) {
+                        $sql = 'UPDATE ' . _DB_PREFIX_ . 'idnk_csp
+                                SET idnkcategory_shadow = "' . $db->escape($shadowColor) . '"
+                                WHERE idnkcategory_id = ' . (int)$categoryId;
+                        $db->Execute($sql);
+                    }
+
+                    // Actualizar tamaño de texto si es necesario
+                    if ($txtSize) {
+                        $sql = 'UPDATE ' . _DB_PREFIX_ . 'idnk_csp
+                                SET idnkcategory_txtsize = "' . $db->escape($txtSize) . '"
+                                WHERE idnkcategory_id = ' . (int)$categoryId;
+                        $db->Execute($sql);
+                    }
+                }
+
+            } else {
+                // Si no se seleccionan categorías, limpiar la tabla
+                Configuration::updateValue('IDNK_CSP_SELECTED_CAT', '');
+                $db = Db::getInstance();
+                $sql = 'DELETE FROM ' . _DB_PREFIX_ . 'idnk_csp';
+                $db->Execute($sql);
             }
         }
-        return $this->displayConfirmation($this->l('The settings have been updated.'));
     }
+
+    return $this->displayConfirmation($this->l('The settings have been updated.'));
+}
 
     /**
      * Add the CSS & JavaScript files you want to be loaded in the BO.
@@ -377,40 +431,66 @@ class IdnkCategoryshowproducts extends Module
         $this->context->controller->addCSS($this->_path.'/views/css/front.css');
     }
 
-    public function hookDisplayHome()
-    {
-        $enabled = Configuration::get('IDNK_CSP_LIVE_MODE', true);
-        if ($enabled == 1) {
-            $this->context->controller->addJS($this->_path.'/views/js/front.js');
-            $this->context->controller->addCSS($this->_path.'/views/css/front.css');
-            $this->context->smarty->assign([
-                'categories' => Configuration::get('IDNK_CSP_SELECTED_CAT'),
-                'megamenulink' => $this->context->link->getModuleLink('idnk_csp', 'display')
-            ]);
-            $db = Db::getInstance();
-            $sql='SELECT * FROM ' . _DB_PREFIX_ . 'idnk_csp ORDER BY idnkcategory_id ASC';
-            $results=$db->ExecuteS($sql);
-            $id_lang = (int)$this->context->cookie->id_lang;
-            $id_shop = (int)$this->context->shop->id;
-            $catnum = 0;
-            $category_array = [[]];
-            foreach ($results as $row) {
-                $category = new Category($row['idnkcategory_id']);
-                $current_name = $category->getName((int)$id_lang);
-                $category_array[$catnum]['category_name'] = $current_name;
-                $category_array[$catnum]['category_color'] = $row['idnkcategory_color'];
-                $category_array[$catnum]['category_image'] = Context::getContext()->shop->getBaseURL(true) . "modules/idnkcategoryshowproducts/views/img/" . $row['idnkcategory_img'];
-                $category_array[$catnum]['category_children'] = Category::getChildren((int)$row['idnkcategory_id'], (int)$id_lang, true, (int)$id_shop);
-                $category_array[$catnum]['category_product'] = $this->prepareBlocksProducts($category->getProducts((int)Context::getContext()->language->id, 1, 6, 'position'));
-                $catnum++;
-            }
-            $this->context->smarty->assign([
-                'category' => $category_array,
-            ]);
-            return $this->display(__FILE__, 'cblocks.tpl');
+public function hookDisplayHome()
+{
+    $enabled = Configuration::get('IDNK_CSP_LIVE_MODE', true);
+    if ($enabled == 1) {
+        $this->context->controller->addJS($this->_path.'/views/js/front.js');
+        $this->context->controller->addCSS($this->_path.'/views/css/front.css');
+        $this->context->smarty->assign([
+            'categories' => Configuration::get('IDNK_CSP_SELECTED_CAT'),
+            'megamenulink' => $this->context->link->getModuleLink('idnk_csp', 'display')
+        ]);
+
+        // Detectar el tema activo
+        $theme = $this->context->shop->theme->get('name');
+
+        // Seleccionar plantilla de bloques de categorías según el tema
+        if ($theme == 'classic') {
+            $template = 'catblocks_c.tpl';
+            $product_template = 'catalog/_partials/miniatures/product.tpl'; // Plantilla de miniaturas en el tema classic
+        } elseif ($theme == 'child_classic') {
+            $template = 'catblocks_c.tpl';
+            $product_template = 'catalog/_partials/miniatures/product.tpl'; // Plantilla de miniaturas en child_classic
+        } elseif ($theme == 'hummingbird') {
+            $template = 'catblocks_h.tpl';
+            $product_template = 'catalog/_partials/miniatures/product.tpl'; // Plantilla de miniaturas en hummingbird
+        } else {
+            $template = 'cblocks.tpl'; // Cargar por defecto
+            $product_template = 'catalog/_partials/miniatures/product.tpl'; // Plantilla por defecto
         }
-        return false;
+
+        $db = Db::getInstance();
+        $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'idnk_csp ORDER BY idnkcategory_id ASC';
+        $results = $db->ExecuteS($sql);
+        $id_lang = (int)$this->context->cookie->id_lang;
+        $id_shop = (int)$this->context->shop->id;
+        $catnum = 0;
+        $category_array = [[]];
+        foreach ($results as $row) {
+            $category = new Category($row['idnkcategory_id']);
+            $current_name = $category->getName((int)$id_lang);
+            $category_array[$catnum]['category_name'] = $current_name;
+            $category_array[$catnum]['category_color'] = $row['idnkcategory_color'];
+            $category_array[$catnum]['category_shadow'] = $row['idnkcategory_shadow'];
+            $category_array[$catnum]['category_txtsize'] = $row['idnkcategory_txtsize'];
+            $category_array[$catnum]['category_image'] = Context::getContext()->shop->getBaseURL(true) . "modules/idnkcategoryshowproducts/views/img/" . $row['idnkcategory_img'];
+            $category_array[$catnum]['category_children'] = Category::getChildren((int)$row['idnkcategory_id'], (int)$id_lang, true, (int)$id_shop);
+            $category_array[$catnum]['category_product'] = $this->prepareBlocksProducts($category->getProducts((int)Context::getContext()->language->id, 1, 6, 'position'));
+            $catnum++;
+        }
+
+        // Pasar la plantilla de miniaturas del tema activo
+        $this->context->smarty->assign([
+            'category' => $category_array,
+            'product_template' => $product_template, // Asignar plantilla de miniaturas
+        ]);
+
+        // Retornar la plantilla seleccionada
+        return $this->display(__FILE__, $template);
     }
+    return false;
+}
 
     public function prepareBlocksProducts($products)
     {
